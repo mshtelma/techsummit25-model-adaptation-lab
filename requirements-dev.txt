@@ -1,0 +1,7 @@
+pyspark
+black
+ipython
+pandas
+numpy
+mlflow
+databricks-sdk

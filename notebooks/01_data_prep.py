@@ -20,8 +20,10 @@ uc_volume_path = f"/Volumes/{uc_target_catalog}/{uc_target_schema}/data"
 set_or_create_catalog_and_database(uc_target_catalog, uc_target_schema)
 
 workspace_data_path = str((pathlib.Path.cwd() / ".." / "data").resolve())
-shutil.rmtree(f"{uc_volume_path}/*", ignore_errors=True)
-shutil.copytree(workspace_data_path, uc_volume_path, dirs_exist_ok=True)
+try:
+    shutil.copytree(workspace_data_path, uc_volume_path, dirs_exist_ok=True)
+except Exception as e:
+    print(e)
 w.dbutils.fs.ls(uc_volume_path)
 
 # COMMAND ----------

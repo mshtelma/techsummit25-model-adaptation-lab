@@ -1,7 +1,7 @@
-import json
 from typing import List, Dict
 
 from pyspark.sql import DataFrame
+from pyspark.sql.types import ArrayType, StructType, StructField, StringType
 
 SYSTEM_INSTRUCTION = """You are a Regulatory Reporting Assistant.
 Please answer the question as precise as possible using information in context.
@@ -21,15 +21,13 @@ def format_chat_completion(
     )
     messages.append({"role": "assistant", "content": answer})
 
-    return {"messages": messages}
+    return messages
 
 
 def transform_chat_udf(iterator):
     for df in iterator:
         df["messages"] = df.apply(
-            lambda row: json.dumps(
-                format_chat_completion(row["context"], row["question"], row["answer"])
-            ),
+            lambda row: format_chat_completion(row["context"], row["question"], row["answer"]),
             axis=1,
         )
         df = df[["messages"]]
@@ -39,11 +37,16 @@ def transform_chat_udf(iterator):
 def prepare_ift_dataset(
         spark_df: DataFrame = None,
         limit: int = -1,
-        context_col: str = "context",
-        question_col: str = "question",
-        response_col: str = "answer",
 ) -> DataFrame:
+    schema = StructType([
+        StructField("messages", ArrayType(
+            StructType([
+                StructField("content", StringType(), nullable=True),
+                StructField("role", StringType(), nullable=True)
+            ])
+        ))
+    ])
     if limit > 0:
         spark_df = spark_df.limit(limit)
-    transformed_sdf = spark_df.mapInPandas(transform_chat_udf, schema="messages string")
+    transformed_sdf = spark_df.mapInPandas(transform_chat_udf, schema=schema)
     return transformed_sdf

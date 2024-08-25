@@ -9,15 +9,18 @@ import shutil
 from databricks.sdk import WorkspaceClient
 
 from finreganalytics.dataprep.dataloading import load_and_clean_data, split
+from finreganalytics.utils import get_user_name, set_or_create_catalog_and_database
 
 w = WorkspaceClient()
 
-email = spark.sql('select current_user() as user').collect()[0]['user']
-uc_volume_path = "/Volumes/msh/test/data"
-uc_target_catalog = "msh"
-uc_target_schema = "test"
+uc_target_catalog = "main"
+uc_target_schema = get_user_name()
+uc_volume_path = f"/Volumes/{uc_target_catalog}/{uc_target_schema}/data"
+
+set_or_create_catalog_and_database(uc_target_catalog, uc_target_schema)
 
 workspace_data_path = str((pathlib.Path.cwd() / ".." / "data").resolve())
+shutil.rmtree(f"{uc_volume_path}/*", ignore_errors=True)
 shutil.copytree(workspace_data_path, uc_volume_path, dirs_exist_ok=True)
 w.dbutils.fs.ls(uc_volume_path)
 

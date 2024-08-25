@@ -56,7 +56,7 @@ Context information is below.
 
 ---------------------
 {context}
----------------------
+---------------------  
 
 You are an expert in European Financial Regulation. 
 You are answering questions related to Financial Regulation for the Financial Institutes in the European Union. 
@@ -87,5 +87,5 @@ qa_ift_df = prepare_ift_dataset(qa_questions_df, limit=-1)
 
 ift_train_df, ift_val_df = qa_ift_df.randomSplit([0.9, 0.1])
 
-ift_train_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_instruction_train")
-ift_val_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_instruction_val")
+ift_train_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_instructions_train")
+ift_val_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_instructions_val")

@@ -55,8 +55,8 @@ cluster_id = get_current_cluster_id()
 
 run = fm.create(
     model=base_model,
-    train_data_path=f"{uc_target_catalog}.{uc_target_schema}.qa_instruction_train",
-    eval_data_path=f"{uc_target_catalog}.{uc_target_schema}.qa_instruction_val",
+    train_data_path=f"{uc_target_catalog}.{uc_target_schema}.qa_instructions_train",
+    eval_data_path=f"{uc_target_catalog}.{uc_target_schema}.qa_instructions_val",
     register_to=f"{uc_target_catalog}.{uc_target_schema}.fin_reg_model",
     training_duration=training_duration,
     learning_rate=learning_rate,

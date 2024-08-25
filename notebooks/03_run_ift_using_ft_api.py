@@ -13,16 +13,15 @@
 # MAGIC
 
 # COMMAND ----------
-uc_target_catalog = "msh"
-uc_target_schema = "test"
-# COMMAND ----------
-
 
 from databricks.model_training import foundation_model as fm
 
-from finreganalytics.utils import setup_logging, get_dbutils, get_current_cluster_id
+from finreganalytics.utils import setup_logging, get_dbutils, get_current_cluster_id, get_user_name
 
 setup_logging()
+
+uc_target_catalog = get_user_name()
+uc_target_schema = get_user_name()
 
 supported_models = fm.get_models().to_pandas()["name"].to_list()
 get_dbutils().widgets.combobox(

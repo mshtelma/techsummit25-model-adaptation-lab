@@ -10,11 +10,11 @@ from finreganalytics.dataprep.ift_data_prep import (
     prepare_ift_dataset,
 )
 from finreganalytics.dataprep.qagen import build_instruction_eval_dataset
-from finreganalytics.utils import get_spark
+from finreganalytics.utils import get_spark, get_user_name
 
 # COMMAND ----------
-uc_target_catalog = "msh"
-uc_target_schema = "test"
+uc_target_catalog = get_user_name()
+uc_target_schema = get_user_name()
 # COMMAND ----------
 
 

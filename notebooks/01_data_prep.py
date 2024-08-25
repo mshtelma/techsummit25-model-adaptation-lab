@@ -13,7 +13,7 @@ from finreganalytics.utils import get_user_name, set_or_create_catalog_and_datab
 
 w = WorkspaceClient()
 
-uc_target_catalog = "main"
+uc_target_catalog = get_user_name()
 uc_target_schema = get_user_name()
 uc_volume_path = f"/Volumes/{uc_target_catalog}/{uc_target_schema}/data"
 

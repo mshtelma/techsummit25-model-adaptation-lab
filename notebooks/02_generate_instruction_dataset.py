@@ -2,8 +2,9 @@
 # MAGIC %pip install -r ../requirements.txt
 # MAGIC dbutils.library.restartPython()
 # COMMAND ----------
-
+from huggingface_hub.utils import chunk_iterable
 from langchain_community.chat_models.databricks import ChatDatabricks
+from pyspark.sql.functions import rand
 
 from finreganalytics.dataprep.ift_data_prep import (
     prepare_ift_dataset,
@@ -14,15 +15,12 @@ from finreganalytics.utils import get_spark, get_user_name, batchify
 # COMMAND ----------
 uc_target_catalog = "msh"
 uc_target_schema = "finreg2"
+
+if (locals().get("uc_target_catalog") is None
+        or locals().get("uc_target_schema") is None):
+    uc_target_catalog = get_user_name()
+    uc_target_schema = get_user_name()
 # COMMAND ----------
-
-
-chunks_df = get_spark().read.table(f"{uc_target_catalog}.{uc_target_schema}.splitted_documents")
-chunks = chunks_df.toPandas()["text"].values.tolist()
-
-# COMMAND ----------
-
-
 INITIAL_QUESTION_GENERATION_PROMPT_TMPL = """\
 Context information is below.
 
@@ -169,10 +167,13 @@ Do not include any further information and do not write if the question is good 
 """
 
 # COMMAND ----------
+chunks_df = get_spark().read.table(f"{uc_target_catalog}.{uc_target_schema}.splitted_documents").orderBy(rand())
+chunks = chunks_df.toPandas()["text"].values.tolist()[:100]
+
 llm = ChatDatabricks(endpoint="databricks-meta-llama-3-1-70b-instruct", temperature=0.9)
 
 qa_questions_df = build_instruction_eval_dataset(
-    chunks[300:305],
+    chunks[:2],
     llm,
     initial_question_prompt_template_str=INITIAL_QUESTION_GENERATION_PROMPT_TMPL,
     judgement_question_prompt_template_str=JUDGEMENT_QUESTION_GENERATION_PROMPT_TMPL,
@@ -183,18 +184,13 @@ qa_questions_df = build_instruction_eval_dataset(
 )
 display(qa_questions_df)  # noqa
 # COMMAND ----------
-number_of_questions = 20
-
-(
-    get_spark()
-    .createDataFrame(qa_questions_df)
-    .write
-    .mode("append")
-    .saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_dataset")
-)
+number_of_questions = 2
+chunk_length = 20
 
 for i in range(number_of_questions):
-    for current_chunk in batchify(chunks, 500):
+    print(f"Iteration: {i}\n")
+    for current_chunk in batchify(chunks, chunk_length):
+        print(f"Chunk length: {len(current_chunk)}\n")
         qa_questions_df = build_instruction_eval_dataset(
             current_chunk,
             llm,
@@ -208,7 +204,7 @@ for i in range(number_of_questions):
         (
             get_spark()
             .createDataFrame(qa_questions_df)
-            .write()
+            .write
             .mode("append")
             .saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_dataset")
         )
@@ -216,9 +212,13 @@ for i in range(number_of_questions):
 # COMMAND ----------
 display(get_spark().read.table(f"{uc_target_catalog}.{uc_target_schema}.qa_dataset"))  # noqa
 # COMMAND ----------
-qa_ift_df = prepare_ift_dataset(get_spark().read.table(f"{uc_target_catalog}.{uc_target_schema}.qa_dataset"), limit=-1)
 
-ift_train_df, ift_val_df = qa_ift_df.randomSplit([0.9, 0.1])
+qa_train_df, qa_val_df = get_spark().read.table(f"{uc_target_catalog}.{uc_target_schema}.qa_dataset").orderBy(rand()).randomSplit([0.9, 0.1])
+qa_train_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_dataset_train")
+qa_val_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_dataset_val")
 
-ift_train_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_instructions_train")
-ift_val_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_instructions_val")
+qa_ift_train_df = prepare_ift_dataset(qa_train_df, limit=-1)
+qa_ift_val_df = prepare_ift_dataset(qa_val_df, limit=-1)
+
+qa_ift_train_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_instructions_train")
+qa_ift_val_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_instructions_val")

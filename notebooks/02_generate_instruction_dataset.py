@@ -2,7 +2,6 @@
 # MAGIC %pip install -r ../requirements.txt
 # MAGIC dbutils.library.restartPython()
 # COMMAND ----------
-from huggingface_hub.utils import chunk_iterable
 from langchain_community.chat_models.databricks import ChatDatabricks
 from pyspark.sql.functions import rand
 
@@ -213,7 +212,8 @@ for i in range(number_of_questions):
 display(get_spark().read.table(f"{uc_target_catalog}.{uc_target_schema}.qa_dataset"))  # noqa
 # COMMAND ----------
 
-qa_train_df, qa_val_df = get_spark().read.table(f"{uc_target_catalog}.{uc_target_schema}.qa_dataset").orderBy(rand()).randomSplit([0.9, 0.1])
+qa_train_df, qa_val_df = get_spark().read.table(f"{uc_target_catalog}.{uc_target_schema}.qa_dataset").orderBy(
+    rand()).randomSplit([0.9, 0.1])
 qa_train_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_dataset_train")
 qa_val_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_dataset_val")
 
@@ -222,3 +222,5 @@ qa_ift_val_df = prepare_ift_dataset(qa_val_df, limit=-1)
 
 qa_ift_train_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_instructions_train")
 qa_ift_val_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.qa_instructions_val")
+# COMMAND ----------
+display(get_spark().read.table(f"{uc_target_catalog}.{uc_target_schema}.qa_instructions_val"))  # noqa

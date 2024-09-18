@@ -1,4 +1,18 @@
 # Databricks notebook source
+# MAGIC %md 
+# MAGIC # Model Adaptation Demo 
+# MAGIC ## Fine-tuning a European Financial Regulation Assistant model 
+# MAGIC
+# MAGIC In this demo we will generate synthetic question/answer data about Capital Requirements Regulation and after that will use this data to dine tune the Llama 3.0 8B model.
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Fine-Tuning 
+# MAGIC In this notebook we will fine-tune Llama 3.0 8B model on the generated synthetic dataset
+
+# COMMAND ----------
+
 # MAGIC %pip install -r ../requirements.txt
 
 # COMMAND ----------
@@ -20,15 +34,17 @@ from finreganalytics.utils import setup_logging, get_dbutils, get_current_cluste
 
 setup_logging()
 
-uc_target_catalog = get_user_name()
-uc_target_schema = get_user_name()
+uc_target_catalog = "msh"
+uc_target_schema = "test"
+
+if (locals().get("uc_target_catalog") is None
+        or locals().get("uc_target_schema") is None):
+    uc_target_catalog = get_user_name()
+    uc_target_schema = get_user_name()
 
 supported_models = fm.get_models().to_pandas()["name"].to_list()
 get_dbutils().widgets.combobox(
     "base_model", "meta-llama/Meta-Llama-3-8B-Instruct", supported_models, "base_model"
-)
-get_dbutils().widgets.text(
-    "data_path", "/Volumes/main/finreg/training/ift/jsonl", "data_path"
 )
 
 get_dbutils().widgets.text("training_duration", "1ep", "training_duration")
@@ -42,7 +58,6 @@ get_dbutils().widgets.text(
 # COMMAND ----------
 
 base_model = get_dbutils().widgets.get("base_model")
-data_path = get_dbutils().widgets.get("data_path")
 training_duration = get_dbutils().widgets.get("training_duration")
 learning_rate = get_dbutils().widgets.get("learning_rate")
 custom_weights_path = get_dbutils().widgets.get("custom_weights_path")
@@ -56,7 +71,7 @@ run = fm.create(
     model=base_model,
     train_data_path=f"{uc_target_catalog}.{uc_target_schema}.qa_instructions_train",
     eval_data_path=f"{uc_target_catalog}.{uc_target_schema}.qa_instructions_val",
-    register_to=f"{uc_target_catalog}.{uc_target_schema}.fin_reg_model",
+    register_to=f"{uc_target_catalog}.{uc_target_schema}.fin_reg_model_test",
     training_duration=training_duration,
     learning_rate=learning_rate,
     task_type="CHAT_COMPLETION",

@@ -1,4 +1,18 @@
 # Databricks notebook source
+# MAGIC %md 
+# MAGIC # Model Adaptation Demo 
+# MAGIC ## Fine-tuning a European Financial Regulation Assistant model 
+# MAGIC
+# MAGIC In this demo we will generate synthetic question/answer data about Capital Requirements Regulation and after that will use this data to dine tune the Llama 3.0 8B model.
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Evaluating Model
+# MAGIC In this notebook we will evaluate the model we have fine-tuned during the previous step
+
+# COMMAND ----------
+
 # MAGIC %pip install -r ../requirements.txt
 # MAGIC dbutils.library.restartPython()
 
@@ -14,6 +28,7 @@ from finreganalytics.dataprep.ift_data_prep import SYSTEM_INSTRUCTION
 from finreganalytics.utils import get_spark, get_user_name
 
 # COMMAND ----------
+
 uc_target_catalog = "msh"
 uc_target_schema = "finreg2"
 
@@ -25,6 +40,7 @@ if (locals().get("uc_target_catalog") is None
 
 # COMMAND ----------
 
+# MAGIC %md In the next cell we will prepare the functions needed to build the evaluation chain
 
 # COMMAND ----------
 
@@ -52,6 +68,10 @@ def build_retrievalqa_with_context_chain(llm: BaseLanguageModel):
 
 # COMMAND ----------
 
+# MAGIC %md We will need to create a PT endpoint for the model we have fine-tuned during the previous step. I have done this manually using Databricks UI.
+
+# COMMAND ----------
+
 llm = ChatDatabricks(endpoint="llama38b", temperature=0.99)
 qa_chain_with_ctx = build_retrievalqa_with_context_chain(llm)
 
@@ -71,11 +91,14 @@ val_qa_eval_sdf = (
 display(val_qa_eval_sdf)  # noqa
 
 # COMMAND ----------
+
 limit = 10
 val_qa_eval_pdf = val_qa_eval_sdf.toPandas()
 if limit > 0:
     val_qa_eval_pdf = val_qa_eval_pdf[:limit]
+
 # COMMAND ----------
+
 eval_results = evaluate_qa_chain(
     val_qa_eval_pdf,
     ["context", "question"],

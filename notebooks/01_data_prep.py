@@ -1,12 +1,38 @@
 # Databricks notebook source
+# MAGIC %md 
+# MAGIC # Model Adaptation Demo 
+# MAGIC ## Fine-tuning a European Financial Regulation Assistant model 
+# MAGIC
+# MAGIC In this demo we will generate synthetic question/answer data about Capital Requirements Regulation and after that will use this data to dine tune the Llama 3.0 8B model.
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Data Preparation
+
+# COMMAND ----------
+
 # MAGIC %pip install -r ../requirements.txt
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
+
+# MAGIC %md 
+# MAGIC In the following cell we will specify the target catalog and schema where we will store all the tables we create during this demo. 
+
+# COMMAND ----------
+
 uc_target_catalog = "msh"
 uc_target_schema = "test"
 uc_volume_path = "/Volumes/msh/finreg/data"
+
 # COMMAND ----------
+
+# MAGIC %md
+# MAGIC If the catalog, schema or source data path is not defined, we will try to create a new catalog and schema and copy sample pdf files from the git repo. 
+
+# COMMAND ----------
+
 import pathlib
 import shutil
 
@@ -33,8 +59,18 @@ if (locals().get("uc_target_catalog") is None
     w.dbutils.fs.ls(uc_volume_path)
 
 # COMMAND ----------
+
+# MAGIC %md Now we can ingest the pdf files and  parse their content
+
+# COMMAND ----------
+
 docs_df = load_and_clean_data(uc_volume_path)
 display(docs_df) # noqa
+
+# COMMAND ----------
+
+# MAGIC %md After ingesting pdfs and transforming them tot he simple text, we will split the documents and store the chunks as a delta table
+
 # COMMAND ----------
 
 splitted_df = split(
@@ -44,6 +80,8 @@ display(splitted_df) # noqa
 
 # COMMAND ----------
 
-splitted_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.splitted_documents")
+# MAGIC %md Now let's store the chunks as a delta table
 
 # COMMAND ----------
+
+splitted_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.splitted_documents")

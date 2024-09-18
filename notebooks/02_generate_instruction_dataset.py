@@ -30,20 +30,27 @@ from finreganalytics.utils import get_spark, get_user_name
 # COMMAND ----------
 
 # MAGIC %md In the following cell we will specify the target catalog and schema where we will store all the tables we create during this demo.
-# MAGIC If the catalog, schema or source data path is not defined, we will try to create a new catalog and schema and copy sample pdf files from the git repo.
 
 # COMMAND ----------
+
 uc_target_catalog = get_user_name()
 uc_target_schema = get_user_name()
+
 # COMMAND ----------
 
-
+# MAGIC
 # MAGIC %md
-# MAGIC In the following cell, we define the prompt to generate an initial question that corresponds to the chunk of text.
+# MAGIC In the following cell, we will read all the splitted documents using Spark and transform them to a simple python list. 
+
 # COMMAND ----------
 
 chunks_df = get_spark().read.table(f"{uc_target_catalog}.{uc_target_schema}.splitted_documents")
 chunks = chunks_df.toPandas()["text"].values.tolist()
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC In the following cell, we define the prompts to generate a question and answer that corresponds to the chunk of text.
 
 # COMMAND ----------
 
@@ -96,6 +103,11 @@ Answer:
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC Now we can use the prompts we have defined in the previous cell to build question and answer dataset. 
+
+# COMMAND ----------
+
 qa_questions_df = build_instruction_eval_dataset(
     chunks[100:200],
     llm_dbrx,
@@ -107,6 +119,12 @@ qa_questions_df = spark.createDataFrame(qa_questions_df)
 display(qa_questions_df)  # noqa
 
 # COMMAND ----------
+
+# MAGIC %md
+# MAGIC After we have built the dataset containing questions and answers, it's time to transform it to the instructions using chat completion format.
+
+# COMMAND ----------
+
 qa_ift_df = prepare_ift_dataset(qa_questions_df, limit=-1)
 
 ift_train_df, ift_val_df = qa_ift_df.randomSplit([0.9, 0.1])

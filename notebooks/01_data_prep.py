@@ -18,12 +18,8 @@
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC In the following cell we will specify the target catalog and schema where we will store all the tables we create during this demo.
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC If the catalog, schema or source data path is not defined, we will try to create a new catalog and schema and copy sample pdf files from the git repo.
+# MAGIC In the following cell we will create a new catalog and schema for you and copy sample pdf files to the newly-created UC Volume.
+# MAGIC We will use your email to define the catalog and schema name. 
 
 # COMMAND ----------
 
@@ -73,6 +69,8 @@ display(splitted_df) # noqa
 # COMMAND ----------
 
 # MAGIC %md Now let's store the chunks as a delta table
-splitted_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.splitted_documents")
+# MAGIC
 
 # COMMAND ----------
+
+splitted_df.write.mode("overwrite").saveAsTable(f"{uc_target_catalog}.{uc_target_schema}.splitted_documents")

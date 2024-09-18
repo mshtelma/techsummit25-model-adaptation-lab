@@ -1,4 +1,19 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC # Model Adaptation Demo
+# MAGIC ## Fine-tuning a European Financial Regulation Assistant model
+# MAGIC
+# MAGIC In this demo we will generate synthetic question/answer data about Capital Requirements Regulation and after that will use this data to dine tune the Llama 3.0 8B model.
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Synthetic Data Generation
+# MAGIC In this notebook we will use the CoT technique to create high quality questions and answers about Capital Requirements Regulation.
+# MAGIC We will iterate over all the chunks we created in the first step and generate a question about the facts mentioned in the chunk and then ask an LLM to answer this question using the provided chunk.
+
+# COMMAND ----------
+
 # MAGIC %pip install -r ../requirements.txt
 # MAGIC dbutils.library.restartPython()
 
@@ -13,10 +28,19 @@ from finreganalytics.dataprep.qagen import build_instruction_eval_dataset
 from finreganalytics.utils import get_spark, get_user_name
 
 # COMMAND ----------
+
+# MAGIC %md In the following cell we will specify the target catalog and schema where we will store all the tables we create during this demo.
+# MAGIC If the catalog, schema or source data path is not defined, we will try to create a new catalog and schema and copy sample pdf files from the git repo.
+
+# COMMAND ----------
 uc_target_catalog = get_user_name()
 uc_target_schema = get_user_name()
 # COMMAND ----------
 
+
+# MAGIC %md
+# MAGIC In the following cell, we define the prompt to generate an initial question that corresponds to the chunk of text.
+# COMMAND ----------
 
 chunks_df = get_spark().read.table(f"{uc_target_catalog}.{uc_target_schema}.splitted_documents")
 chunks = chunks_df.toPandas()["text"].values.tolist()

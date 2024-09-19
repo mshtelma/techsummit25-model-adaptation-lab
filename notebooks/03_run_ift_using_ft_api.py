@@ -58,7 +58,6 @@ get_dbutils().widgets.text(
 # COMMAND ----------
 
 base_model = get_dbutils().widgets.get("base_model")
-data_path = get_dbutils().widgets.get("data_path")
 training_duration = get_dbutils().widgets.get("training_duration")
 learning_rate = get_dbutils().widgets.get("learning_rate")
 custom_weights_path = get_dbutils().widgets.get("custom_weights_path")
@@ -86,8 +85,16 @@ run = fm.create(
 
 # COMMAND ----------
 
+# MAGIC %md Let's examine the run object now!
+
+# COMMAND ----------
+
+run
+
+# COMMAND ----------
+
 # MAGIC %md
-# MAGIC In the following cell you can see the events which happens to our run
+# MAGIC Now we can look into lifecylce of our Run
 
 # COMMAND ----------
 
@@ -101,3 +108,25 @@ display(fm.get_events(run))
 # COMMAND ----------
 
 display(fm.list())
+
+# COMMAND ----------
+
+# MAGIC %md Let's stop all runs now since we do not want to consume a lot of GPU resources!
+
+# COMMAND ----------
+
+for run in fm.list():
+  fm.cancel(run.name)
+
+
+# COMMAND ----------
+
+# MAGIC %md By now all the Runs must be in "STOPPED" or "TERMINATING" state
+
+# COMMAND ----------
+
+display(fm.list())
+
+# COMMAND ----------
+
+

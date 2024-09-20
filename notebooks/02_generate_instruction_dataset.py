@@ -50,12 +50,11 @@ chunks = chunks_df.toPandas()["text"].values.tolist()
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC In the following cell, we define the prompts to generate a question and answer that corresponds to the chunk of text.
+# MAGIC In the following cell, we define the prompt template to generate specified number of questions using provided chunk of text.
 
 # COMMAND ----------
 
-llm_dbrx = ChatDatabricks(endpoint="databricks-meta-llama-3-1-70b-instruct", temperature=0.9)
-EVALUATION_QUESTION_GENERATION_PROMPT_TMPL = """\
+QUESTION_GENERATION_PROMPT_TMPL = """\
 Context information is below.
 
 ---------------------
@@ -82,7 +81,20 @@ Always format the output in JSON format as follows:
 "What is Common Reporting Framework (COREP) ?" 
 ] 
 ``` """
-QA_TEMPLATE_RAG = """
+
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC Please define the prompt template in the `ANSWER_TEMPLATE_RAG` variable that will ask an LLM to answer the question using the provided cointext. 
+# MAGIC You can use the previous prompt template as an example. 
+# MAGIC The prompt template must use two variables:
+# MAGIC - `context` - for provided context (chunk of text)
+# MAGIC - `question` - for the question an LLM must answer
+
+# COMMAND ----------
+
+ANSWER_TEMPLATE_RAG = """
 Context information is below.
 
 ---------------------
@@ -99,6 +111,7 @@ Please do not repeat the answer and do not add any additional information.
 Question: {question}
 
 Answer:
+
 """
 
 # COMMAND ----------
@@ -108,11 +121,13 @@ Answer:
 
 # COMMAND ----------
 
+llm_dbrx = ChatDatabricks(endpoint="databricks-meta-llama-3-1-70b-instruct", temperature=0.9)
+
 qa_questions_df = build_instruction_eval_dataset(
     chunks[100:200],
     llm_dbrx,
-    question_prompt_template_str=EVALUATION_QUESTION_GENERATION_PROMPT_TMPL,
-    answer_prompt_template_str=QA_TEMPLATE_RAG,
+    question_prompt_template_str=QUESTION_GENERATION_PROMPT_TMPL,
+    answer_prompt_template_str=ANSWER_TEMPLATE_RAG,
     num_questions_per_chunk=2,
 )
 qa_questions_df = spark.createDataFrame(qa_questions_df)

@@ -31,6 +31,7 @@ def set_or_create_catalog_and_database(catalog: str, db_name: str):
     get_spark().sql(f"CREATE DATABASE IF NOT EXISTS  `{catalog}`.`{db_name}` ")
     get_spark().sql(f"GRANT CREATE, USAGE on DATABASE `{catalog}`.`{db_name}` TO `account users`")
     get_spark().sql(f"ALTER SCHEMA `{catalog}`.`{db_name}` OWNER TO `account users`")
+    get_spark().sql(f"GRANT ALL PRIVILEGES ON CATALOG `{catalog}` TO `{get_user_email()}`;")
     get_spark().sql(f"USE `{catalog}`.`{db_name}`")
     get_spark().sql(f"CREATE VOLUME IF NOT EXISTS `{catalog}`.`{db_name}`.data")
 

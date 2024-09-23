@@ -79,10 +79,10 @@ def build_instruction_eval_dataset(
         context=itemgetter("context"),
         question=question_prompt | llm | StrOutputParser(),
     ).with_retry(
-        stop_after_attempt=10, wait_exponential_jitter=False
+        stop_after_attempt=500, wait_exponential_jitter=False
     )
 
-    questions_results = questions_chain.batch(chunks, config={"max_concurrency": 4})
+    questions_results = questions_chain.batch(chunks, config={"max_concurrency": 1})
     questions_df = pd.DataFrame(
         [
             {
@@ -98,9 +98,9 @@ def build_instruction_eval_dataset(
         context=itemgetter("context"),
         question=itemgetter("question"),
         answer=answer_prompt | llm | StrOutputParser(),
-    ).with_retry(stop_after_attempt=10, wait_exponential_jitter=False)
+    ).with_retry(stop_after_attempt=500, wait_exponential_jitter=False)
     answers_results = answers_chain.batch(
-        questions_dict_list, config={"max_concurrency": 4}
+        questions_dict_list, config={"max_concurrency": 1}
     )
     res_df = pd.DataFrame(answers_results).dropna()
     return res_df

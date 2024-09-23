@@ -106,7 +106,7 @@ ANSWER_TEMPLATE_RAG = """
 
 # COMMAND ----------
 
-llm_dbrx = ChatDatabricks(endpoint="databricks-meta-llama-3-1-70b-instruct", temperature=0.9)
+llm_dbrx = ChatDatabricks(endpoint="dbacademy-llama-3-1-70b", temperature=0.9)
 
 qa_questions_df = build_instruction_eval_dataset(
     chunks[100:200],
@@ -115,7 +115,7 @@ qa_questions_df = build_instruction_eval_dataset(
     answer_prompt_template_str=ANSWER_TEMPLATE_RAG,
     num_questions_per_chunk=2,
 )
-qa_questions_df = spark.createDataFrame(qa_questions_df)
+qa_questions_df = spark.createDataFrame(qa_questions_df) # noqa
 display(qa_questions_df)  # noqa
 
 # COMMAND ----------

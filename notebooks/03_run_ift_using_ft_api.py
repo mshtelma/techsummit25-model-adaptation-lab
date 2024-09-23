@@ -80,7 +80,11 @@ run = fm.create(
     training_duration=training_duration,
     learning_rate=learning_rate,
     task_type="CHAT_COMPLETION",
-    data_prep_cluster_id=cluster_id
+    data_prep_cluster_id=cluster_id,
+    eval_prompts=[
+        "Which financial instruments can be used as CET1 instruments according to the CRR?",
+        "What items are required to be deducted from CET1 capital under the CRR?",
+    ]
 )
 
 # COMMAND ----------
@@ -116,8 +120,7 @@ display(fm.list())
 # COMMAND ----------
 
 for run in fm.list():
-  fm.cancel(run.name)
-
+    fm.cancel(run.name)
 
 # COMMAND ----------
 
@@ -128,5 +131,3 @@ for run in fm.list():
 display(fm.list())
 
 # COMMAND ----------
-
-

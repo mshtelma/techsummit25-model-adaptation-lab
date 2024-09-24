@@ -3,13 +3,13 @@
 # MAGIC # Model Adaptation Demo 
 # MAGIC ## Fine-tuning a European Financial Regulation Assistant model 
 # MAGIC
-# MAGIC In this demo we will generate synthetic question/answer data about Capital Requirements Regulation and after that will use this data to dine tune the Llama 3.0 8B model.
+# MAGIC In this demo we will generate synthetic question/answer data about Capital Requirements Regulation and after that will use this data to fine tune the Llama 3.0 8B model.
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## Evaluating Model
-# MAGIC In this notebook we will evaluate the model we have fine-tuned during the previous step
+# MAGIC In this notebook we will evaluate the model we have fine-tuned during the previous step.
 
 # COMMAND ----------
 
@@ -40,7 +40,7 @@ if (locals().get("uc_target_catalog") is None
 
 # COMMAND ----------
 
-# MAGIC %md In the next cell we will prepare the functions needed to build the evaluation chain
+# MAGIC %md In the next cell, we will prepare the functions needed to build the evaluation chain.
 
 # COMMAND ----------
 
@@ -68,7 +68,7 @@ def build_retrievalqa_with_context_chain(llm: BaseLanguageModel):
 
 # COMMAND ----------
 
-# MAGIC %md We will need to create a PT endpoint for the model we have fine-tuned during the previous step. I have done this manually using Databricks UI.
+# MAGIC %md We will need to create a provisioned throughput (PT) endpoint for the model we have fine-tuned during the previous step. I have done this manually using Databricks UI.
 
 # COMMAND ----------
 

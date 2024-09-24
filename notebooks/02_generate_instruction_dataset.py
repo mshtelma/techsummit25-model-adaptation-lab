@@ -3,14 +3,14 @@
 # MAGIC # Model Adaptation Demo 
 # MAGIC ## Fine-tuning a European Financial Regulation Assistant model 
 # MAGIC
-# MAGIC In this demo we will generate synthetic question/answer data about Capital Requirements Regulation and after that will use this data to dine tune the Llama 3.0 8B model.
+# MAGIC In this demo we will generate synthetic question/answer data about Capital Requirements Regulation and after that will use this data to fine tune the Llama 3.0 8B model.
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## Synthetic Data Generation
-# MAGIC In this notebook we will use the CoT technique to create high quality questions and answers about Capital Requirements Regulation.
-# MAGIC We will iterate over all the chunks we created in the first step and generate a question about the facts mentioned in the chunk and then ask an LLM to answer this question using the provided chunk. 
+# MAGIC In this notebook we will use the chain of though (CoT) technique to create high quality questions and answers about Capital Requirements Regulation.
+# MAGIC We will iterate over all the chunks we created in the first step and generate a question about the facts mentioned in the chunk. Then we will ask an LLM to answer this question using the provided chunk. 
 
 # COMMAND ----------
 
@@ -30,7 +30,7 @@ from finreganalytics.utils import get_spark, get_user_name, batchify
 
 # COMMAND ----------
 
-# MAGIC %md In the following cell we will specify the target catalog and schema where we will store all the tables we create during this demo. 
+# MAGIC %md In the following cell, we will specify the target catalog and schema where we will store all the tables we create during this demo. 
 # MAGIC If the catalog, schema or source data path is not defined, we will try to create a new catalog and schema and copy sample pdf files from the git repo. 
 
 # COMMAND ----------

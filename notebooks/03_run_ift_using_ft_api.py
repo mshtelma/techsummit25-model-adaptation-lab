@@ -3,13 +3,13 @@
 # MAGIC # Model Adaptation Demo 
 # MAGIC ## Fine-tuning a European Financial Regulation Assistant model 
 # MAGIC
-# MAGIC In this demo we will generate synthetic question/answer data about Capital Requirements Regulation and after that will use this data to dine tune the Llama 3.0 8B model.
+# MAGIC In this demo we will generate synthetic question/answer data about Capital Requirements Regulation and after that will use this data to fine tune the Llama 3.0 8B model.
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ## Fine-Tuning 
-# MAGIC In this notebook we will fine-tune Llama 3.0 8B model on the generated synthetic dataset
+# MAGIC In this notebook we will fine-tune Llama 3.0 8B model on the generated synthetic dataset.
 
 # COMMAND ----------
 

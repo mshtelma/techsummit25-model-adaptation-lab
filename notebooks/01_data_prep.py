@@ -3,7 +3,7 @@
 # MAGIC # Model Adaptation Demo 
 # MAGIC ## Fine-tuning a European Financial Regulation Assistant model 
 # MAGIC
-# MAGIC In this demo we will generate synthetic question/answer data about Capital Requirements Regulation and after that will use this data to dine tune the Llama 3.0 8B model.
+# MAGIC In this demo we will generate synthetic question/answer data about Capital Requirements Regulation and after that will use this data to fine tune the Llama 3.0 8B model.
 
 # COMMAND ----------
 
@@ -18,7 +18,7 @@
 # COMMAND ----------
 
 # MAGIC %md 
-# MAGIC In the following cell we will specify the target catalog and schema where we will store all the tables we create during this demo. 
+# MAGIC In the following, cell we will specify the target catalog and schema where we will store all the tables we create during this demo. 
 
 # COMMAND ----------
 
@@ -60,7 +60,7 @@ if (locals().get("uc_target_catalog") is None
 
 # COMMAND ----------
 
-# MAGIC %md Now we can ingest the pdf files and  parse their content
+# MAGIC %md Now we can ingest the pdf files and  parse their content.
 
 # COMMAND ----------
 
@@ -69,7 +69,7 @@ display(docs_df) # noqa
 
 # COMMAND ----------
 
-# MAGIC %md After ingesting pdfs and transforming them tot he simple text, we will split the documents and store the chunks as a delta table
+# MAGIC %md After ingesting pdfs and transforming them to text, we split the documents and store the chunks as a Delta table.
 
 # COMMAND ----------
 
@@ -80,7 +80,7 @@ display(splitted_df) # noqa
 
 # COMMAND ----------
 
-# MAGIC %md Now let's store the chunks as a delta table
+# MAGIC %md Now let's store the chunks as a Delta table.
 
 # COMMAND ----------
 
